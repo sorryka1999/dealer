@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+</head>
+<body>
+
+    <div th:fragment="selectCar">
+        <select name="carId" onchange="selectPrototype(this.value)" required>
+            <option value="">select a car:</option>
+            <option th:each="car : ${cars}" th:value="${car.id}" th:text="${car.name}"/>
+        </select>
+    </div>
+
+    <div th:fragment="selectPrototype">
+        <select id="prototypeId" name="prototypeId" onchange="showPrice()" required>
+            <option value="">select a prototype:</option>
+            <option th:each="prototype : ${prototypes}" th:value="${prototype.id}" th:text="${prototype.name}"/>
+        </select>
+    </div>
+
+    <div th:fragment="showPrice">
+        <h3 style="display: inline-block;">price:</h3>
+        <h3 th:text="${calcPrice}" style="display: inline-block;"/>
+    </div>
+
+</body>
+</html>

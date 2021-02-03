@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>admin</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+</head>
+<body style="width: 960px; margin: auto;">
+    <form th:action="@{/logout}" method="post" class="m-4">
+        <input type="submit" value="Sign Out" class="btn btn-warning"/>
+    </form>
+    <div class="m-4 border border-primary rounded-lg p-2">
+        <form th:action="@{/admin/addBrand}" method="post">
+            <p>adding brand</p>
+            <input type="text" placeholder="name" name="brandName" required>
+            <input type="submit" name="submit" class="btn btn-light">
+        </form>
+        <p>list of brands</p>
+        <table class="table table-bordered">
+            <tr>
+                <th>brand name</th>
+                <th>activity</th>
+                <th>deleting</th>
+            </tr>
+            <tr th:each="brand : ${brands}">
+                <td><span th:text="${brand.name}"/></td>
+                <td th:id="${'brandActiveStatus' + brand.id}">
+                    <span th:text="${brand.active}"/>
+                    <button th:onclick="'changeBrandActive(\'' + ${brand.id} + '\');'"
+                    class="btn btn-info">change</button>
+                </td>
+                <td>
+                    <form th:action="@{'/admin/deleteBrand/' + ${brand.id}}" method="post">
+                        <button type="submit" class="btn btn-warning">delete</button>
+                    </form>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="m-4 border border-primary rounded-lg p-2">
+        <form th:action="@{/admin/addCar}" method="post">
+            <select name="brandId" onchange="showCars(this.value)" required>
+                <option value="">select a brand:</option>
+                <option th:each="brand : ${brands}" th:value="${brand.id}" th:text="${brand.name}"/>
+            </select>
+            <p>adding car</p>
+            <input type="text" placeholder="name" name="carName" required>
+            <input type="submit" name="submit" class="btn btn-light">
+        </form>
+        <div>
+            <div id="showCars"></div>
+        </div>
+    </div>
+    <div class="m-4 border border-primary rounded-lg p-2">
+        <form th:action="@{/admin/addPrototype}" method="post">
+            <select name="brandId" onchange="selectCar(this.value)" required>
+                <option value="">select a brand:</option>
+                <option th:each="brand : ${brands}" th:value="${brand.id}" th:text="${brand.name}"/>
+            </select>
+            <div id="selectCar" style="display: inline-block;">
+                <select name="carId" onchange="showPrototypes(this.value)" required>
+                    <option value="">select a car:</option>
+                </select>
+            </div>
+            <p>adding prototype</p>
+            <input type="text" placeholder="price" name="prototypePrice" required>
+            <input type="text" placeholder="name" name="prototypeName" required>
+            <input type="submit" name="submit" class="btn btn-light">
+        </form>
+        <div>
+            <div id="showPrototypes"></div>
+        </div>
+    </div>
+    <div class="m-4 border border-primary rounded-lg p-2">
+        <p>list of orders</p>
+        <table class="table table-bordered">
+            <tr>
+                <th>order name</th>
+                <th>year</th>
+                <th>price</th>
+                <th>firstname</th>
+                <th>lastname</th>
+                <th>email address</th>
+                <th>deleting</th>
+            </tr>
+            <tr th:each="order : ${orders}">
+                <td th:text="${order.orderName}"/>
+                <td th:text="${order.year}"/>
+                <td th:text="${order.calcPrice}"/>
+                <td th:text="${order.firstname}"/>
+                <td th:text="${order.lastname}"/>
+                <td th:text="${order.email}"/>
+                <td>
+                    <form th:action="@{'/admin/deleteOrder/' + ${order.id}}" method="post">
+                        <button type="submit" class="btn btn-warning">delete</button>
+                    </form>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <script type="text/javascript">
+        function changeBrandActive(brandId) {
+            var xhttp;
+            xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    document.getElementById("brandActiveStatus" + brandId)
+                    .innerHTML = this.responseText;
+                }
+            };
+            xhttp.open("POST", "admin/changeBrandActive/" + brandId, true);
+            xhttp.send();
+        }
+        function showCars(brandId) {
+            var xhttp;
+            if (brandId == "") {
+                document.getElementById("showCars").innerHTML = "";
+                return;
+            }
+            xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    document.getElementById("showCars").innerHTML = this.responseText;
+                }
+            };
+            xhttp.open("POST", "admin/getCars/" + brandId, true);
+            xhttp.send();
+        }
+        function changeCarActive(carId) {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    document.getElementById("carActiveStatus" + carId)
+                    .innerHTML = this.responseText;
+                }
+            };
+            xhttp.open("POST", "/admin/changeCarActive/" + carId, true);
+            xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhttp.send();
+        }
+        function selectCar(brandId) {
+            var xhttp;
+            if (brandId == "") {
+                document.getElementById("selectCar").innerHTML = "";
+                return;
+            }
+            xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    document.getElementById("selectCar").innerHTML = this.responseText;
+                }
+            };
+            xhttp.open("POST", "admin/selectCar/" + brandId, true);
+            xhttp.send();
+        }
+        function showPrototypes(carId) {
+            var xhttp;
+            if (carId == "") {
+                document.getElementById("showPrototypes").innerHTML = "";
+                return;
+            }
+            xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    document.getElementById("showPrototypes").innerHTML = this.responseText;
+                }
+            };
+            xhttp.open("POST", "admin/getPrototypes/" + carId, true);
+            xhttp.send();
+        }
+        function changePrototypeActive(prototypeId) {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    document.getElementById("prototypeActiveStatus" + prototypeId)
+                    .innerHTML = this.responseText;
+                }
+            };
+            xhttp.open("POST", "/admin/changePrototypeActive/" + prototypeId, true);
+            xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhttp.send();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+</head>
+<body>
+
+    <div th:fragment="brandActiveChange">
+        <span th:text="${brand.active}"/>
+        <button th:onclick="'changeBrandActive(\'' + ${brand.id} + '\');'"
+        class="btn btn-info">change</button>
+    </div>
+
+    <div th:fragment="carActiveChange">
+        <span th:text="${car.active}"/>
+        <button th:onclick="'changeCarActive(\'' + ${car.id} + '\');'"
+        class="btn btn-info">change</button>
+    </div>
+
+    <div th:fragment="prototypeActiveChange">
+        <span th:text="${prototype.active}"/>
+        <button th:onclick="'changePrototypeActive(\'' + ${prototype.id} + '\');'"
+        class="btn btn-info">change</button>
+    </div>
+
+    <div th:fragment="showCars">
+        <p>list of cars</p>
+        <table class="table table-bordered">
+            <tr>
+                <th>brand name</th>
+                <th>car name</th>
+                <th>activity</th>
+                <th>deleting</th>
+            </tr>
+            <tr th:each="car : ${cars}">
+                <td><span th:text="${car.brandName}"/></td>
+                <td><span th:text="${car.name}"/></td>
+                <td th:id="${'carActiveStatus' + car.id}">
+                    <span th:text="${car.active}"/>
+                    <button th:onclick="'changeCarActive(\'' + ${car.id} + '\');'"
+                    class="btn btn-info">change</button>
+                </td>
+                <td>
+                    <form th:action="@{'/admin/deleteCar/' + ${car.id}}" method="post">
+                        <button type="submit" class="btn btn-warning">delete</button>
+                    </form>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div th:fragment="selectCar">
+        <select name="carId" onchange="showPrototypes(this.value)" required>
+            <option value="">select a car:</option>
+            <option th:each="car : ${cars}" th:value="${car.id}" th:text="${car.name}"/>
+        </select>
+    </div>
+
+    <div th:fragment="showPrototypes">
+        <table class="table table-bordered">
+            <tr>
+                <th>brand name</th>
+                <th>car name</th>
+                <th>prototype name</th>
+                <th>price</th>
+                <th>activity</th>
+                <th>deleting</th>
+            </tr>
+            <tr th:each="prototype : ${prototypes}">
+                <td><span th:text="${prototype.carBrandName}"/></td>
+                <td><span th:text="${prototype.carName}"/></td>
+                <td><span th:text="${prototype.name}"/></td>
+                <td><span th:text="${prototype.price}"/></td>
+                <td th:id="${'prototypeActiveStatus' + prototype.id}">
+                    <span th:text="${prototype.active}"/>
+                    <button th:onclick="'changePrototypeActive(\'' + ${prototype.id} + '\');'"
+                    class="btn btn-info">change</button>
+                </td>
+                <td>
+                    <form th:action="@{'/admin/deletePrototype/' + ${prototype.id}}" method="post">
+                        <button type="submit" class="btn btn-warning">delete</button>
+                    </form>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+</body>
+</html>
